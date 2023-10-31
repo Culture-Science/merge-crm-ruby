@@ -123,20 +123,10 @@ module MergeCRMClient
     # @return [Object] Returns the model itself
     def build_from_hash(attributes)
       return nil unless attributes.is_a?(Hash)
-      self.class.openapi_types.each_pair do |key, type|
-        if attributes[self.class.attribute_map[key]].nil? && self.class.openapi_nullable.include?(key)
-          self.send("#{key}=", nil)
-        elsif type =~ /\AArray<(.*)>/i
-          # check to ensure the input is an array given that the attribute
-          # is documented as an array but the input is not
-          if attributes[self.class.attribute_map[key]].is_a?(Array)
-            self.send("#{key}=", attributes[self.class.attribute_map[key]].map { |v| _deserialize($1, v) })
-          end
-        elsif !attributes[self.class.attribute_map[key]].nil?
-          self.send("#{key}=", _deserialize(type, attributes[self.class.attribute_map[key]]))
-        end
-      end
-
+      self.remote_field_class = _deserialize(:RemoteFieldClass, attributes[:remote_field_class])
+      field_type = attributes[:remote_field_class][:field_type]
+      field_format = attributes[:remote_field_class][:field_format]
+      self.value = _deserialize(field_type, attributes[:value], field_format)
       self
     end
 
@@ -144,38 +134,27 @@ module MergeCRMClient
     # @param string type Data type
     # @param string value Value to be deserialized
     # @return [Object] Deserialized data
-    def _deserialize(type, value)
+    def _deserialize(type, value, format = nil)
       case type.to_sym
-      when :Time
+      when :time
         Time.parse(value)
-      when :Date
+      when :datetime
+        DateTime.parse(value)
+      when :date
         Date.parse(value)
-      when :String
+      when :string
         value
-      when :Integer
-        value.to_i
-      when :Float
+      when :number
         value.to_f
-      when :Boolean
+      when :bool
         if value.to_s =~ /\A(true|t|yes|y|1)\z/i
           true
         else
           false
         end
-      when :Object
+      when :object
         # generic object (usually a Hash), return directly
         value
-      when /\AArray<(?<inner_type>.+)>\z/
-        inner_type = Regexp.last_match[:inner_type]
-        value.map { |v| _deserialize(inner_type, v) }
-      when /\AHash<(?<k_type>.+?), (?<v_type>.+)>\z/
-        k_type = Regexp.last_match[:k_type]
-        v_type = Regexp.last_match[:v_type]
-        {}.tap do |hash|
-          value.each do |k, v|
-            hash[_deserialize(k_type, k)] = _deserialize(v_type, v)
-          end
-        end
       else # model
         # models (e.g. Pet) or oneOf
         klass = MergeCRMClient.const_get(type)
