@@ -36,7 +36,7 @@ module MergeCRMClient
     def self.openapi_types
       {
         :'remote_field_class' => :'RemoteFieldClass',
-        :'value' => :'Hash<String, Object>'
+        :'value' => :String
       }
     end
 
