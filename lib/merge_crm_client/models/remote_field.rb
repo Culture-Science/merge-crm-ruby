@@ -141,7 +141,12 @@ module MergeCRMClient
       when :datetime
         DateTime.parse(value)
       when :date
-        Date.parse(value)
+        case format&.to_sym
+        when :time
+          Time.parse(value)
+        else
+          Date.parse(value)
+        end
       when :string
         value
       when :number
